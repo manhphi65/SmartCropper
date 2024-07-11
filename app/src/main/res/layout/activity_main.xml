@@ -18,17 +18,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="take a photo"/>
-
-        <Button
-            android:id="@+id/btn_select"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="select from album"/>
+            android:text="crop a photo"/>
 
     </LinearLayout>
-
 
     <ImageView
         android:id="@+id/iv_show"

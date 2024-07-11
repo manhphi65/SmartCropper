@@ -1,13 +1,11 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-group='com.github.pqpo'
 
 android {
-    compileSdkVersion 29
-
+    compileSdk 34
+    namespace "me.pqpo.smartcropperlib"
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 29
+        minSdk 23
+        targetSdk 34
         versionCode 10
         versionName "2.1.4"
 

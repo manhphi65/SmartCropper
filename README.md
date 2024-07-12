@@ -1,79 +1,68 @@
 # SmartCropper
 
-## [English](README_EN.md) | 中文
+## English | [中文](README.md)
 
-***目前优化了一套更高识别率的模型和算法，有意向合作的请联系邮箱：pqponet@gmail.com***
+A library for cropping image in a smart way that can identify the border and correct the cropped image. Applicable to ID cards, business cards, documents and other photos of the crop. If you like, welcome star, fork or follow me.
 
-简单易用的智能图片裁剪库，适用于身份证，名片，文档等照片的裁剪。 如果觉得还不错，欢迎 star，fork。
+You can also follow my other library [SmartCamera](https://github.com/pqpo/SmartCamera): SmartCamera is an Android camera extension library，provides a scanning module that can recognizes whether the object's border inside the camera matches the area in real time.
 
-你也可以关注我的另一个库 [SmartCamera](https://github.com/pqpo/SmartCamera)： SmartCamera 是一个 Android 相机拓展库，能够实时采集并且识别相机内物体边框是否吻合指定区域。
+## Features
 
-## 支持特性
+- Crop image in a smart way that can identify the border.
+- Support drag anchors, magnifying glass effect to enhance the positioning experience.
+- Use the perspective transform to crop and correct the selection to restore the front image.
+- Support rich UI settings, such as auxiliary lines, mask, anchor, magnifying glass and so on.
 
-- 使用智能算法(基于opencv)识别图片中的边框  
-- 支持拖动锚点，手动调节选区，放大镜效果提升定位体验
-- 使用透视变换裁剪并矫正选区，还原正面图片
-- 支持丰富的UI设置，如辅助线，蒙版，锚点，放大镜等
+## Sample（[link](art/SmartCropperSampleV6.apk)）
 
-## 例子（[传送门](art/SmartCropperSampleV6.apk)）
-
-### 1. 选择图片后智能选区，使用透视变换裁剪并矫正选区：
+### 1. Select a image, use the perspective transform to crop and correct the selection:
 
 ![](art/smart_crop_1.png)
 ![](art/cropped_1.png)
 
-### 2. 拖动锚点，手动调节选区，右上角放大镜效果方便拖拽定位：
+### 2. drag anchors, magnifying glass effect to enhance the positioning experience:
 
 ![](art/advance_crop_2.png)
 
-### gif 动画：
+### gif：
 
 ![](art/smartcropper_photo.gif)
 ![](art/smartcropper_album_1.gif)
 
-## 优化智能选区算法(V2.1.1+)
-使用机器学习算法代理 Canny 算法，提高识别率(基于 TensorFlow 的 HED 网络).
-感谢：https://github.com/fengjian0106/hed-tutorial-for-document-scanning
+## Import
 
-1. build.gradle 添加如下代码，不压缩模型：
-```gradle
-aaptOptions {
-    noCompress "tflite"
-    noCompress "lite"
-}
+if version >= v1.2.4:
+
+aar download: https://github.com/pqpo/SmartCropper/releases
+
+else:
+
+Step 1. Add it in your root build.gradle at the end of repositories:
 ```
-2. 在合适的地方初始化(比如在 Application.onCreate)：
-```java
-SmartCropper.buildImageDetector(this);
-```
-
-## 接入
-
-1.根目录下的 build.gradle 添加：
-```gradle
-allprojects {
+	allprojects {
 		repositories {
 			...
 			maven { url 'https://jitpack.io' }
 		}
-}
-```
-2.添加依赖
-```gradle
-dependencies {
-	  compile 'com.github.pqpo:SmartCropper:v2.1.3'
-}
+	}
 ```
 
-注意：由于使用了 JNI， 请**不要混淆**  
+Step 2. Add the dependency
+```
+	dependencies {
+	        compile 'com.github.pqpo:SmartCropper:v2.1.3'
+	}
+```
+
+note：
 
 ```
 -keep class me.pqpo.smartcropperlib.**{*;}
 ```  
 
-## 使用  
+## Usage  
 
-### 1. 裁剪布局：  
+### 1. Use CropImageView in your xml file.  
 ```xml
 <me.pqpo.smartcropperlib.view.CropImageView   
         android:id="@+id/iv_crop"  
@@ -81,63 +70,58 @@ dependencies {
         android:layout_height="match_parent" />  
 ```  
 
-注意： CropImageView 继承至 ImageView，但是 ScaleType 必须为居中类型，如果手动设置成 fit_end,fit_start,matrix 将会报错。  
+note： CropImageView extends from ImageView，and ScaleType must be center type，If you set ScaleType to fit_end,fit_start,matrix will throws an error。  
 
-### 2. 设置待裁剪图片：    
+### 2. Set image to crop：    
+
 ```java
 ivCrop.setImageToCrop(selectedBitmap); 
 ```
 
-该方法内部会使用 native 代码智能识别边框，并绘制图片与选区。在 native 层实现，大大的提高了运行效率，运行时间与图片大小成正比，在大图片的情况下，可以考虑在子线程执行，或者压缩传入的图片。
+It will identify the border by native(c/c++), and show Image.     
 
-### 3. 裁剪选区内的图片：
+### 3. Crop the image：
 
 ```java  
-Bitmap crop = ivCrop.crop();  
-```  
+Bitmap crop = ivCrop.crop();
+```
 
-根据选区裁剪出选区内的图片，并使用透视变换矫正成正面图片。  
 
-注意：改方法主要逻辑也是位于 native 层，运行时间与图片大小成正比，在大图片的情况下，可以考虑在子线程执行，或者压缩传入的图片。
+### Optimization of intelligent selection algorithm:
 
-## Attributes
+Tensorflow HED Net instant of Canny:
 
-|name|format|description|
-|:---:|:---:|:---:|
-|civMaskAlpha|integer|选区外蒙版的透明度，取值范围 0-255|
-|civShowGuideLine|boolean|是否显示辅助线，默认 true|
-|civLineColor|color|选区线的颜色|
-|civLineWidth|dimension|选区线的宽度|
-|civShowMagnifier|boolean|在拖动的时候是否显示放大镜，默认 true|
-|civMagnifierCrossColor|color|放大镜十字准心的颜色|
-|civGuideLineWidth|dimension|辅助线宽度|
-|civGuideLineColor|color|辅助线颜色|
-|civPointFillColor|color|锚点内部区域填充颜色|
-|civPointFillAlpha|integer|锚点内部区域填充颜色透明度|
+1. build.gradle ：
+```gradle
+aaptOptions {
+    noCompress "tflite"
+    noCompress "lite"
+}
+```
+2. Application.onCreate：
+```java
+SmartCropper.buildImageDetector(this);
+```
 
 ## Features
 
-- [x] 优化点排序算法
-- [x] CropImageView 选区放大镜效果
-- [x] CropImageView xml属性配置
-- [x] 优化智能选区算法
-- [ ] 欢迎提 ISSUE
+- [x] Optimization point sorting algorithm
+- [x] CropImageView selection magnifying effect
+- [x] CropImageView xml settings
+- [x] Optimization of intelligent selection algorithm
+- [ ] Please submit ISSUEs
 
 ---
 
-## 关于我：
+## Author：
 
-- 邮箱：    pqponet@gmail.com
+- Email：    pqponet@gmail.com
 - GitHub：  [pqpo](https://github.com/pqpo)
-- 博客：    [pqpo's notes](https://pqpo.me)
+- Blog：    [pqpo's notes](https://pqpo.me)
 - Twitter: [Pqponet](https://twitter.com/Pqponet)
-- 微信公众号: pqpo_me(扫下方二维码) 
+- WeChat: pqpo_me
 
 <img src="art/qrcode_for_gh.jpg" width="200">
-
-- qq群: Github 开源交流群
-
-<img src="art/qq_qr.jpeg" width="200">
 
 License
 -------
